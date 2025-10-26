@@ -126,6 +126,342 @@ const featureNameMap: { display: string, featureName: FeatureName }[] = [
 	{ display: 'Source Control', featureName: 'SCM' },
 ];
 
+const LoginPage = ({ setPageType }: { setPageType: (stepperType: StepperFlowType) => void }) => {
+	return (
+		<>
+			<form className="space-y-4">
+				<div>
+					<label htmlFor="email" className='text-sm text-neutral-400'>Email</label>
+					<input
+						id="email"
+						type="email"
+						placeholder="Your email address"
+						className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+					/>
+				</div>
+
+				<button
+					type="submit"
+					className="w-full py-2 bg-white text-black rounded-md font-medium hover:bg-gray-200 transition"
+					onClick={() => setPageType('signIn')}
+				>
+					Continue
+				</button>
+
+				<div className="flex items-center gap-2 text-gray-500 text-sm my-4">
+					<div className="flex-1 h-px bg-neutral-700"></div>
+					<span>OR</span>
+					<div className="flex-1 h-px bg-neutral-700"></div>
+				</div>
+
+				<div className="space-y-2">
+					<button
+						type="button"
+						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
+					>
+						{/* <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" /> */}
+						Continue with Google
+					</button>
+
+					<button
+						type="button"
+						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
+					>
+						{/* <img src="https://www.svgrepo.com/show/512317/github-142.svg" className="w-5 h-5 invert" /> */}
+						Continue with GitHub
+					</button>
+
+					<button
+						type="button"
+						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
+					>
+						{/* <img src="https://www.svgrepo.com/show/349442/apple.svg" className="w-5 h-5 invert" /> */}
+						Continue with Apple
+					</button>
+				</div>
+
+				<p className="text-center text-sm text-gray-500 mt-6">
+					Don't have an account?&nbsp;&nbsp;
+					<a href="#" className="text-blue-500 hover:underline"
+						onClick={() => setPageType('signUp')}
+					>Sign up</a>
+				</p>
+			</form>
+
+		</>
+	)
+}
+
+const SignInPasswordPage = ({ setPageIndex }: { setPageIndex: (idx: 3 | 5) => void }) => {
+	return (
+		<>
+			{/* Email */}
+			<div className="mb-4">
+				<label className="text-sm text-neutral-400 block mb-1">Email</label>
+				<p className="text-sm text-neutral-200">••••••••@gmail.com</p>
+			</div>
+
+			{/* Password */}
+			<div className="mb-6">
+				<div className="flex justify-between items-center mb-1">
+					<label className="text-sm text-neutral-400">Password</label>
+					<button className="text-xs text-neutral-400 hover:underline"
+						onClick={() => setPageIndex(3)}
+					>
+						Forgot your password?
+					</button>
+				</div>
+				<input
+					type="password"
+					placeholder="Your password"
+					className="w-full rounded-md bg-neutral-950 border border-neutral-700 focus:border-neutral-500 focus:outline-none px-3 py-2 text-sm placeholder-neutral-500"
+				/>
+			</div>
+
+			{/* Sign in button */}
+			<button className="w-full bg-white text-black font-medium py-2 rounded-md hover:bg-neutral-200 transition">
+				Sign in
+			</button>
+
+			{/* Divider */}
+			<div className="flex items-center my-4">
+				<div className="flex-grow h-px bg-neutral-700" />
+				<span className="text-neutral-500 text-xs mx-2">OR</span>
+				<div className="flex-grow h-px bg-neutral-700" />
+			</div>
+
+			{/* Email sign-in code */}
+			<button className="w-full border border-neutral-700 py-2 rounded-md text-sm flex items-center justify-center space-x-2 hover:bg-neutral-800 transition"
+				onClick={() => setPageIndex(5)}
+			>
+				<span className="text-lg">✉️</span>
+				<span>Email sign-in code</span>
+			</button>
+
+			{/* Footer */}
+			<p className="text-xs text-neutral-600 mt-8">
+				Terms of Service and Privacy Policy
+			</p>
+		</>
+	);
+}
+
+const SignUpPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageIndex: (index: number) => void }) => {
+	return (
+		<>
+			<form className="space-y-4">
+				{/*  First / Last Name */}
+				<div className="grid grid-cols-2 gap-3">
+					<div>
+						<label className="text-sm text-gray-400" htmlFor="firstName">First name</label>
+						<input
+							type="text"
+							id="firstName"
+							placeholder="Your first name"
+							className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						/>
+					</div>
+					<div>
+						<label className="text-sm text-gray-400" htmlFor="lastName">Last name</label>
+						<input
+							type="text"
+							id="lastName"
+							placeholder="Your last name"
+							className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						/>
+					</div>
+				</div>
+
+				{/*  Email */}
+				<div>
+					<label className="text-sm text-gray-400" htmlFor="email">Email</label>
+					<input
+						type="email"
+						id="email"
+						placeholder="Your email address"
+						className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+					/>
+				</div>
+
+				{/*  Continue */}
+				<button
+					type="submit"
+					className="w-full py-2 bg-white text-black rounded-md font-medium hover:bg-gray-200 transition"
+					onClick={() => setPageIndex(pageIndex + 1)}
+				>
+					Continue
+				</button>
+
+				{/*  Divider */}
+				<div className="flex items-center gap-2 text-gray-500 text-sm my-4">
+					<div className="flex-1 h-px bg-neutral-700"></div>
+					<span>OR</span>
+					<div className="flex-1 h-px bg-neutral-700"></div>
+				</div>
+
+				{/*  Social Buttons */}
+				<div className="space-y-2">
+					<button
+						type="button"
+						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
+					>
+						<img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" />
+						Continue with Google
+					</button>
+
+					<button
+						type="button"
+						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
+					>
+						<img src="https://www.svgrepo.com/show/512317/github-142.svg" className="w-5 h-5 invert" />
+						Continue with GitHub
+					</button>
+
+					<button
+						type="button"
+						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
+					>
+						<img src="https://www.svgrepo.com/show/349442/apple.svg" className="w-5 h-5 invert" />
+						Continue with Apple
+					</button>
+				</div>
+
+				{/*  Sign in link */}
+				<p className="text-center text-sm text-gray-500 mt-6">
+					Already have an account?&nbsp;
+					<a href="#" className="text-blue-500 hover:underline">Sign in</a>
+				</p>
+			</form>
+
+			{/*  Footer */}
+			<p className="text-gray-500 text-xs mt-6 text-center max-w-sm leading-relaxed">
+				By creating an account, you agree to the&nbsp;&nbsp;
+				<a href="#" className="underline hover:text-gray-300">Terms of Service</a> and
+				<>&nbsp;&nbsp;</>
+				<a href="#" className="underline hover:text-gray-300">Privacy Policy</a>.
+			</p>
+		</>
+	)
+}
+
+const CreatePasswordPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageIndex: (index: number) => void }) => {
+	return <form className="space-y-4">
+		{/*  Email */}
+		<div>
+			<label htmlFor="email">Email</label>
+			<input
+				type="email"
+				id="email"
+				placeholder="••••••••@gmail.com"
+				className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+				disabled
+			/>
+		</div>
+
+		{/*  Password */}
+		<div>
+			<label htmlFor="password">Password</label>
+			<input
+				type="password"
+				id="password"
+				placeholder="Create a password"
+				className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+
+		{/*  Confirm Password */}
+		<div>
+			<label htmlFor="confirmPassword">Confirm password</label>
+			<input
+				id="confirm-password"
+				type="password"
+				placeholder="Confirm your password"
+				className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+
+		{/*  Continue */}
+		<button
+			type="submit"
+			className="w-full py-2 bg-white text-black rounded-md font-medium hover:bg-gray-200 transition"
+			onClick={() => setPageIndex(pageIndex + 1)}
+		>
+			Continue
+		</button>
+
+		{/*  Divider */}
+		<div className="flex items-center gap-2 text-gray-500 text-sm my-4">
+			<div className="flex-1 h-px bg-neutral-700"></div>
+			<span>OR</span>
+			<div className="flex-1 h-px bg-neutral-700"></div>
+		</div>
+
+		{/*  Continue with Email Code */}
+		<button
+			type="button"
+			className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l9 6 9-6m-18 8h18V8l-9 6-9-6v8z" />
+			</svg>
+			Continue with email code
+		</button>
+	</form>
+
+}
+
+const ConfirmEmailPasswordPage = () => {
+	return (
+		<div className="flex flex-col justify-center items-center" >
+			<p className="text-sm text-neutral-300 mb-6">
+				Enter the code sent to <br />
+				<span className="text-white font-medium">••••••••@gmail.com</span>
+			</p>
+
+			{/* Code Inputs (placeholder area) */}
+			<div className="flex justify-center space-x-2 mb-6">
+				{/* Replace this block with 6 inputs later */}
+				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
+				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
+				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
+				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
+				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
+				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
+			</div>
+
+			{/* Resend Link */}
+			<p className="text-xs text-neutral-500">
+				Didn't receive a code?{" "}
+				<button className="text-white hover:underline">
+					Resend (25)
+				</button>
+			</p>
+		</div >
+	)
+}
+
+const ResetPasswordPage = () => {
+	return (
+		<>
+			{/* Email */}
+			<div className="mb-6">
+				<label className="text-sm text-neutral-400 block mb-1">Email</label>
+				<input
+					type="email"
+					placeholder="••••••••@gmail.com"
+					className="w-full rounded-md bg-neutral-950 border border-neutral-700 focus:border-neutral-500 focus:outline-none px-3 py-2 text-sm placeholder-neutral-500 text-neutral-200"
+					defaultValue="••••••••@gmail.com"
+				/>
+			</div>
+
+			{/* Send reset instructions */}
+			<button className="w-full bg-white text-black font-medium py-2 rounded-md hover:bg-neutral-200 transition">
+				Send reset instructions
+			</button>
+		</>
+	)
+}
+
 const AddProvidersPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageIndex: (index: number) => void }) => {
 	const [currentTab, setCurrentTab] = useState<TabName>('Free');
 	const settingsState = useSettingsState();
@@ -369,6 +705,35 @@ const OnboardingPageShell = ({ top, bottom, content, hasMaxWidth = true, classNa
 	)
 }
 
+const OnboardingFormPageShell = ({ top, bottom, content, title = '', hasMaxWidth = true, className = '', }: {
+	top?: React.ReactNode,
+	bottom?: React.ReactNode,
+	content?: React.ReactNode,
+	title?: string,
+	hasMaxWidth?: boolean,
+	className?: string,
+}) => {
+	return (
+		<div className={`h-[80vh] text-lg flex flex-col justify-center gap-4 w-full mx-auto ${hasMaxWidth ? 'max-w-[600px]' : ''} ${className}`}>
+			{top && <FadeIn className='w-full mb-auto pt-16'>{top}</FadeIn>}
+			{content && <FadeIn className='w-full
+			// my-auto
+			' >
+				<div className='flex flex-col justify-center items-center'>
+					<div className="flex flex-col items-center mb-6">
+						<div className="w-10 h-10 bg-neutral-700 rounded-lg mb-3"></div>
+						<h1 className="text-xl font-semibold">{title}</h1>
+					</div>
+					<div className="bg-neutral-900 rounded-xl p-8 shadow-lg w-full max-w-sm ">
+						{content}
+					</div>
+				</div>
+			</FadeIn>}
+			{bottom && <div className='w-full pb-8'>{bottom}</div>}
+		</div>
+	)
+}
+
 const OllamaDownloadOrRemoveModelButton = ({ modelName, isModelInstalled, sizeGb }: { modelName: string, isModelInstalled: boolean, sizeGb: number | false | 'not-known' }) => {
 	// for now just link to the ollama download page
 	return <a
@@ -465,7 +830,19 @@ const PrimaryActionButton = ({ children, className, ringSize, ...props }: { chil
 }
 
 
+const PrevButton = ({ onClick }: { onClick: () => void }) => <div className="max-w-[600px] w-full mx-auto flex flex-col items-end">
+	<div className="flex items-center gap-2">
+		<PreviousButton
+			onClick={onClick}
+		/>
+		{/* <NextButton
+				onClick={() => { setPageIndex(pageIndex + 1) }}
+			/> */}
+	</div>
+</div>
+
 type WantToUseOption = 'smart' | 'private' | 'cheap' | 'all'
+type StepperFlowType = 'signIn' | 'signUp'
 
 const VoidOnboardingContent = () => {
 
@@ -477,10 +854,12 @@ const VoidOnboardingContent = () => {
 	const voidSettingsState = useSettingsState()
 
 	const [pageIndex, setPageIndex] = useState(0)
-
+	const [stepperType, setStepperType] = useState<StepperFlowType>('signIn')
 
 	// page 1 state
 	const [wantToUseOption, setWantToUseOption] = useState<WantToUseOption>('smart')
+
+	const setStep = (idx: number) => setPageIndex(idx)
 
 	// Replace the single selectedProviderName with four separate states
 	// page 2 state - each tab gets its own state
@@ -524,16 +903,8 @@ const VoidOnboardingContent = () => {
 
 	const didFillInSelectedProviderSettings = !!(didFillInProviderSettings && isApiKeyLongEnoughIfApiKeyExists && isAtLeastOneModel)
 
-	const prevAndNextButtons = <div className="max-w-[600px] w-full mx-auto flex flex-col items-end">
-		<div className="flex items-center gap-2">
-			<PreviousButton
-				onClick={() => { setPageIndex(pageIndex - 1) }}
-			/>
-			<NextButton
-				onClick={() => { setPageIndex(pageIndex + 1) }}
-			/>
-		</div>
-	</div>
+	const prevButton = <PrevButton onClick={() => setPageIndex(idx => idx - 1)} />
+	const returnToSignInButton = <PrevButton onClick={() => setStep(2)} />
 
 
 	const lastPagePrevAndNextButtons = <div className="max-w-[600px] w-full mx-auto flex flex-col items-end">
@@ -591,40 +962,87 @@ const VoidOnboardingContent = () => {
 		}
 	}, [setPageIndex, voidSettingsState.globalSettings.isOnboardingComplete])
 
+	const setPageType = (stepperType: StepperFlowType) => {
+		setStepperType(stepperType)
+		setPageIndex(pageIdx => pageIdx + 1)
+	}
 
-	const contentOfIdx: { [pageIndex: number]: React.ReactNode } = {
+	const stepperFlowStartingPoint: { [pageIndex: number]: React.ReactNode } = {
 		0: <OnboardingPageShell
 			content={
 				<div className='flex flex-col items-center gap-8'>
-					<div className="text-5xl font-light text-center">Welcome to Void</div>
+					<div className="text-5xl font-light text-center">The editor that Evolves with your code</div>
 
 					{/* Slice of Void image */}
 					<div className='max-w-md w-full h-[30vh] mx-auto flex items-center justify-center'>
 						{!isLinux && <VoidIcon />}
 					</div>
 
-
 					<FadeIn
-						delayMs={1000}
+						delayMs={500}
 					>
 						<PrimaryActionButton
 							onClick={() => { setPageIndex(1) }}
 						>
-							Get Started
+							Login/Signup
 						</PrimaryActionButton>
 					</FadeIn>
-
 				</div>
 			}
 		/>,
-
-		1: <OnboardingPageShell hasMaxWidth={false}
+		1: <OnboardingFormPageShell
+			title='Sign in'
 			content={
-				<AddProvidersPage pageIndex={pageIndex} setPageIndex={setPageIndex} />
+				<LoginPage setPageType={setPageType} />
 			}
 		/>,
-		2: <OnboardingPageShell
+	}
 
+	const signInStepperFlow: { [pageIndex: number]: React.ReactNode } = {
+		...stepperFlowStartingPoint,
+		2: <OnboardingFormPageShell
+			title='Sign in'
+			content={<SignInPasswordPage setPageIndex={setStep} />}
+			bottom={prevButton}
+		/>,
+		// resetting password (only email input)
+		3: <OnboardingFormPageShell
+			title='Reset your password'
+			content={<ResetPasswordPage />}
+			bottom={prevButton}
+		/>,
+		// currently unused, reserved for reset password page
+		4: <OnboardingFormPageShell
+			title='Reset your password'
+			content={<CreatePasswordPage pageIndex={pageIndex} setPageIndex={setPageIndex} />}
+			bottom={prevButton}
+		/>,
+		// verifying the code via email
+		5: <OnboardingFormPageShell
+			title='Check your email'
+			content={<ConfirmEmailPasswordPage />}
+			bottom={returnToSignInButton}
+		/>,
+	}
+
+	const signUpStepperFlow: { [pageIndex: number]: React.ReactNode } = {
+		...stepperFlowStartingPoint,
+		2: <OnboardingFormPageShell
+			title='Sign up'
+			content={<SignUpPage pageIndex={pageIndex} setPageIndex={setPageIndex} />}
+			bottom={prevButton}
+		/>,
+		3: <OnboardingFormPageShell
+			title='Create password'
+			content={<CreatePasswordPage pageIndex={pageIndex} setPageIndex={setPageIndex} />}
+			bottom={prevButton}
+		/>,
+		4: <OnboardingFormPageShell
+			title='Check your email'
+			content={<ConfirmEmailPasswordPage />}
+			bottom={prevButton}
+		/>,
+		9: <OnboardingPageShell
 			content={
 				<div>
 					<div className="text-5xl font-light text-center">Settings and Themes</div>
@@ -642,9 +1060,9 @@ const VoidOnboardingContent = () => {
 	}
 
 
-	return <div key={pageIndex} className="w-full h-[80vh] text-left mx-auto flex flex-col items-center justify-center">
+	return <div key={`${stepperType}-${pageIndex}`} className="w-full h-[80vh] text-left mx-auto flex flex-col items-center justify-center">
 		<ErrorBoundary>
-			{contentOfIdx[pageIndex]}
+			{stepperType === 'signIn' ? signInStepperFlow[pageIndex] : signUpStepperFlow[pageIndex]}
 		</ErrorBoundary>
 	</div>
 
