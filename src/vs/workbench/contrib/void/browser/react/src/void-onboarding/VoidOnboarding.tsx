@@ -154,12 +154,11 @@ const LoginPage = ({ setPageType }: { setPageType: (stepperType: StepperFlowType
 					<div className="flex-1 h-px bg-neutral-700"></div>
 				</div>
 
-				<div className="space-y-2">
+				{/* <div className="space-y-2">
 					<button
 						type="button"
 						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
 					>
-						{/* <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" /> */}
 						Continue with Google
 					</button>
 
@@ -167,7 +166,6 @@ const LoginPage = ({ setPageType }: { setPageType: (stepperType: StepperFlowType
 						type="button"
 						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
 					>
-						{/* <img src="https://www.svgrepo.com/show/512317/github-142.svg" className="w-5 h-5 invert" /> */}
 						Continue with GitHub
 					</button>
 
@@ -175,10 +173,9 @@ const LoginPage = ({ setPageType }: { setPageType: (stepperType: StepperFlowType
 						type="button"
 						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
 					>
-						{/* <img src="https://www.svgrepo.com/show/349442/apple.svg" className="w-5 h-5 invert" /> */}
 						Continue with Apple
 					</button>
-				</div>
+				</div> */}
 
 				<p className="text-center text-sm text-gray-500 mt-6">
 					Don't have an account?&nbsp;&nbsp;
@@ -300,7 +297,7 @@ const SignUpPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageInd
 				</div>
 
 				{/*  Social Buttons */}
-				<div className="space-y-2">
+				{/* <div className="space-y-2">
 					<button
 						type="button"
 						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
@@ -324,7 +321,7 @@ const SignUpPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageInd
 						<img src="https://www.svgrepo.com/show/349442/apple.svg" className="w-5 h-5 invert" />
 						Continue with Apple
 					</button>
-				</div>
+				</div> */}
 
 				{/*  Sign in link */}
 				<p className="text-center text-sm text-gray-500 mt-6">
