@@ -58,6 +58,15 @@
 	--vscode-sideBar-background: var(--vscode-editor-background);
 }
 
+.animate-spin{
+	animation: var(--animate-spin); /* spin 1s linear infinite */
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+}
 
 
 /* html {

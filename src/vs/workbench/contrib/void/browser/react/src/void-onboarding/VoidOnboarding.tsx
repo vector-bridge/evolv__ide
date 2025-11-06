@@ -5,13 +5,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useAccessor, useIsDark, useSettingsState } from '../util/services.js';
-import { Brain, Check, ChevronRight, DollarSign, ExternalLink, Lock, X } from 'lucide-react';
+import { Brain, Check, ChevronRight, DollarSign, ExternalLink, Eye, EyeOff, Lock, X } from 'lucide-react';
 import { displayInfoOfProviderName, ProviderName, providerNames, localProviderNames, featureNames, FeatureName, isFeatureNameDisabled } from '../../../../common/voidSettingsTypes.js';
 import { ChatMarkdownRender } from '../markdown/ChatMarkdownRender.js';
 import { OllamaSetupInstructions, OneClickSwitchButton, SettingsForProvider, ModelDump } from '../void-settings-tsx/Settings.js';
 import { ColorScheme } from '../../../../../../../platform/theme/common/theme.js';
 import ErrorBoundary from '../sidebar-tsx/ErrorBoundary.js';
 import { isLinux } from '../../../../../../../base/common/platform.js';
+import { OTPInput, SlotProps } from 'input-otp'
 
 const OVERRIDE_VALUE = false
 
@@ -62,6 +63,15 @@ const VoidIcon = () => {
 	}, [])
 
 	return <div ref={divRef} className='@@void-void-icon' />
+}
+
+// loading spinner
+const Loader = () => {
+	return (
+		<div className='flex justify-center items-center'>
+			<svg className="size-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="#000000" strokeWidth="4"></circle><path className="opacity-75" fill="#000000" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+		</div>
+	)
 }
 
 const FADE_DURATION_MS = 2000
@@ -126,33 +136,90 @@ const featureNameMap: { display: string, featureName: FeatureName }[] = [
 	{ display: 'Source Control', featureName: 'SCM' },
 ];
 
-const LoginPage = ({ setPageType }: { setPageType: (stepperType: StepperFlowType) => void }) => {
+const SubmitFormButton = ({ isSubmitting, title }: { isSubmitting: boolean, title: string }) => {
+	return (
+		<button type='submit' className="w-full py-2 bg-white text-black rounded-md font-medium hover:bg-gray-200 transition text-center">
+			{isSubmitting ? <Loader /> : title}
+		</button>
+	)
+}
+
+const ORDivider = () => (
+	<div className="flex items-center gap-2 text-gray-500 text-sm my-4">
+		<div className="flex-1 h-px bg-neutral-700"></div>
+		<span>OR</span>
+		<div className="flex-1 h-px bg-neutral-700"></div>
+	</div>
+)
+
+const LoginPage = ({ setPageType, setPageIndex }: { setPageType: (stepperType: StepperFlowType) => void, setPageIndex: (idx: 2 | 5 | 6) => void }) => {
+	// signup flow will be selected if user press 'back' in a signup flow
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [showPassword, setShowPassword] = useState(false)
+	const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+
+		const data = new FormData(e.currentTarget)
+		const email = data.get('email')
+		const password = data.get('password')
+		setIsSubmitting(true)
+		const req = await new Promise((resolve) => setTimeout(resolve, 1500));
+		setPageType('signIn')
+		setPageIndex(6)
+		setIsSubmitting(false)
+	}
+
 	return (
 		<>
-			<form className="space-y-4">
-				<div>
-					<label htmlFor="email" className='text-sm text-neutral-400'>Email</label>
-					<input
-						id="email"
-						type="email"
-						placeholder="Your email address"
-						className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-					/>
+			<form className="space-y-4" onSubmit={submitForm}>
+				<div className="grid place-items-center gap-2 w-full">
+					<div className="w-full">
+						<label htmlFor="email" className='text-sm text-neutral-400'>Email</label>
+						<input
+							id="email"
+							name="email"
+							type="email"
+							required
+							placeholder="Your email address"
+							className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						/>
+					</div>
+
+					<div className="w-full">
+						<div className="flex justify-between items-center mb-1">
+							<label htmlFor="password" className="text-sm text-neutral-400">Password</label>
+							<button className="text-xs text-neutral-400 hover:underline"
+								onClick={() => {
+									setPageType('signIn')
+									setPageIndex(2)
+								}}
+							>
+								Forgot your password?
+							</button>
+						</div>
+						<div className="relative">
+							<input
+								id="password"
+								name="password"
+								type={showPassword ? 'text' : "password"}
+								minLength={8}
+								required
+								placeholder="Your password"
+								className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+							/>
+
+							<button
+								type="button"
+								onClick={() => setShowPassword((prev) => !prev)}
+								className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+							>
+								{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+							</button>
+						</div>
+					</div>
 				</div>
 
-				<button
-					type="submit"
-					className="w-full py-2 bg-white text-black rounded-md font-medium hover:bg-gray-200 transition"
-					onClick={() => setPageType('signIn')}
-				>
-					Continue
-				</button>
-
-				<div className="flex items-center gap-2 text-gray-500 text-sm my-4">
-					<div className="flex-1 h-px bg-neutral-700"></div>
-					<span>OR</span>
-					<div className="flex-1 h-px bg-neutral-700"></div>
-				</div>
+				<SubmitFormButton isSubmitting={isSubmitting} title='Continue' />
 
 				{/* <div className="space-y-2">
 					<button
@@ -176,56 +243,9 @@ const LoginPage = ({ setPageType }: { setPageType: (stepperType: StepperFlowType
 						Continue with Apple
 					</button>
 				</div> */}
-
-				<p className="text-center text-sm text-gray-500 mt-6">
-					Don't have an account?&nbsp;&nbsp;
-					<a href="#" className="text-blue-500 hover:underline"
-						onClick={() => setPageType('signUp')}
-					>Sign up</a>
-				</p>
 			</form>
 
-		</>
-	)
-}
-
-const SignInPasswordPage = ({ setPageIndex }: { setPageIndex: (idx: 3 | 5) => void }) => {
-	return (
-		<>
-			{/* Email */}
-			<div className="mb-4">
-				<label className="text-sm text-neutral-400 block mb-1">Email</label>
-				<p className="text-sm text-neutral-200">••••••••@gmail.com</p>
-			</div>
-
-			{/* Password */}
-			<div className="mb-6">
-				<div className="flex justify-between items-center mb-1">
-					<label className="text-sm text-neutral-400">Password</label>
-					<button className="text-xs text-neutral-400 hover:underline"
-						onClick={() => setPageIndex(3)}
-					>
-						Forgot your password?
-					</button>
-				</div>
-				<input
-					type="password"
-					placeholder="Your password"
-					className="w-full rounded-md bg-neutral-950 border border-neutral-700 focus:border-neutral-500 focus:outline-none px-3 py-2 text-sm placeholder-neutral-500"
-				/>
-			</div>
-
-			{/* Sign in button */}
-			<button className="w-full bg-white text-black font-medium py-2 rounded-md hover:bg-neutral-200 transition">
-				Sign in
-			</button>
-
-			{/* Divider */}
-			<div className="flex items-center my-4">
-				<div className="flex-grow h-px bg-neutral-700" />
-				<span className="text-neutral-500 text-xs mx-2">OR</span>
-				<div className="flex-grow h-px bg-neutral-700" />
-			</div>
+			<ORDivider />
 
 			{/* Email sign-in code */}
 			<button className="w-full border border-neutral-700 py-2 rounded-md text-sm flex items-center justify-center space-x-2 hover:bg-neutral-800 transition"
@@ -235,18 +255,34 @@ const SignInPasswordPage = ({ setPageIndex }: { setPageIndex: (idx: 3 | 5) => vo
 				<span>Email sign-in code</span>
 			</button>
 
-			{/* Footer */}
-			<p className="text-xs text-neutral-600 mt-8">
-				Terms of Service and Privacy Policy
+			<p className="text-center text-sm text-gray-500 mt-6">
+				Don't have an account?&nbsp;&nbsp;
+				<a href="#" className="text-blue-500 hover:underline"
+					onClick={() => setPageType('signUp')}
+				>Sign up</a>
 			</p>
 		</>
-	);
+	)
 }
 
-const SignUpPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageIndex: (index: number) => void }) => {
+const SignUpPage = ({ onSuccess, setPageIndex }: { setPageIndex: (idx: number) => void } & OnSuccess) => {
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const namePattern = "^[A-Z][a-zA-Z]*$"
+
+	const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+		const data = new FormData(e.currentTarget)
+		const firstName = data.get('firstName')
+		const lastName = data.get('lastName')
+		setIsSubmitting(true)
+		const req = await new Promise((resolve) => setTimeout(resolve, 1500));
+		onSuccess()
+		setIsSubmitting(false)
+	}
+
 	return (
 		<>
-			<form className="space-y-4">
+			<form className="space-y-4" onSubmit={submitForm}>
 				{/*  First / Last Name */}
 				<div className="grid grid-cols-2 gap-3">
 					<div>
@@ -254,6 +290,9 @@ const SignUpPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageInd
 						<input
 							type="text"
 							id="firstName"
+							name="firstName"
+							required
+							pattern={namePattern}
 							placeholder="Your first name"
 							className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 						/>
@@ -263,6 +302,9 @@ const SignUpPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageInd
 						<input
 							type="text"
 							id="lastName"
+							name="lastName"
+							required
+							pattern={namePattern}
 							placeholder="Your last name"
 							className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 						/>
@@ -275,26 +317,16 @@ const SignUpPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageInd
 					<input
 						type="email"
 						id="email"
+						name="email"
+						required
 						placeholder="Your email address"
 						className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					/>
 				</div>
 
-				{/*  Continue */}
-				<button
-					type="submit"
-					className="w-full py-2 bg-white text-black rounded-md font-medium hover:bg-gray-200 transition"
-					onClick={() => setPageIndex(pageIndex + 1)}
-				>
-					Continue
-				</button>
+				<SubmitFormButton isSubmitting={isSubmitting} title='Continue' />
 
-				{/*  Divider */}
-				<div className="flex items-center gap-2 text-gray-500 text-sm my-4">
-					<div className="flex-1 h-px bg-neutral-700"></div>
-					<span>OR</span>
-					<div className="flex-1 h-px bg-neutral-700"></div>
-				</div>
+				<ORDivider />
 
 				{/*  Social Buttons */}
 				{/* <div className="space-y-2">
@@ -322,13 +354,14 @@ const SignUpPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageInd
 						Continue with Apple
 					</button>
 				</div> */}
-
-				{/*  Sign in link */}
-				<p className="text-center text-sm text-gray-500 mt-6">
-					Already have an account?&nbsp;
-					<a href="#" className="text-blue-500 hover:underline">Sign in</a>
-				</p>
 			</form>
+			{/*  Sign in link */}
+			<p className="text-center text-sm text-gray-500 mt-6">
+				Already have an account?&nbsp;
+				<a href="#" className="text-blue-500 hover:underline"
+					onClick={() => setPageIndex(1)}
+				>Sign in</a>
+			</p>
 
 			{/*  Footer */}
 			<p className="text-gray-500 text-xs mt-6 text-center max-w-sm leading-relaxed">
@@ -341,11 +374,39 @@ const SignUpPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageInd
 	)
 }
 
-const CreatePasswordPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageIndex: (index: number) => void }) => {
-	return <form className="space-y-4">
+const CreatePasswordPage = ({ onSuccess }: OnSuccess) => {
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [error, setError] = useState('')
+	const [showPassword, setShowPassword] = useState(false)
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+	const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+		setError('')
+		e.preventDefault()
+
+		const data = new FormData(e.currentTarget)
+		const password = data.get('password')
+		const confirmPassword = data.get('confirmPassword')
+		if (password !== confirmPassword) {
+			setError('Passwords do not match')
+			return
+		}
+		setIsSubmitting(true)
+		const req = await new Promise((resolve) => setTimeout(resolve, 1500));
+		onSuccess()
+		setIsSubmitting(false)
+	}
+
+	return <form className="space-y-4" onSubmit={submitForm}>
 		{/*  Email */}
 		<div>
-			<label htmlFor="email">Email</label>
+			<label
+				htmlFor="email"
+				className="block text-sm font-medium text-gray-300 mb-1"
+			>
+				Email
+			</label>
+
 			<input
 				type="email"
 				id="email"
@@ -356,106 +417,198 @@ const CreatePasswordPage = ({ pageIndex, setPageIndex }: { pageIndex: number, se
 		</div>
 
 		{/*  Password */}
-		<div>
-			<label htmlFor="password">Password</label>
-			<input
-				type="password"
-				id="password"
-				placeholder="Create a password"
-				className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
+		<div className="relative">
+			<label
+				htmlFor="password"
+				className="block text-sm font-medium text-gray-300 mb-1"
+			>
+				Password
+			</label>
+
+			<div className="relative">
+				<input
+					type={showPassword ? "text" : "password"}
+					id="password"
+					name="password"
+					required
+					minLength={8}
+					placeholder="Your password"
+					className="w-full pl-3 pr-10 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+				/>
+
+				<button
+					type="button"
+					onClick={() => setShowPassword((prev) => !prev)}
+					className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+				>
+					{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+				</button>
+			</div>
 		</div>
 
 		{/*  Confirm Password */}
-		<div>
-			<label htmlFor="confirmPassword">Confirm password</label>
-			<input
-				id="confirm-password"
-				type="password"
-				placeholder="Confirm your password"
-				className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
+		<div className="relative">
+			<label
+				htmlFor="confirmPassword"
+				className="block text-sm font-medium text-gray-300 mb-1"
+			>
+				Confirm password
+			</label>
+
+			<div className="relative">
+				<input
+					type={showConfirmPassword ? "text" : "password"}
+					id="confirmPassword"
+					name="confirmPassword"
+					required
+					minLength={8}
+					placeholder="Confirm your password"
+					className="w-full pl-3 pr-10 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+				/>
+
+				<button
+					type="button"
+					onClick={() => setShowConfirmPassword((prev) => !prev)}
+					className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+				>
+					{showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+				</button>
+			</div>
+
+			{error && <p className="text-red-500 text-sm mt-1">{error}</p>}
 		</div>
 
 		{/*  Continue */}
-		<button
-			type="submit"
-			className="w-full py-2 bg-white text-black rounded-md font-medium hover:bg-gray-200 transition"
-			onClick={() => setPageIndex(pageIndex + 1)}
-		>
-			Continue
-		</button>
-
-		{/*  Divider */}
-		<div className="flex items-center gap-2 text-gray-500 text-sm my-4">
-			<div className="flex-1 h-px bg-neutral-700"></div>
-			<span>OR</span>
-			<div className="flex-1 h-px bg-neutral-700"></div>
-		</div>
-
-		{/*  Continue with Email Code */}
-		<button
-			type="button"
-			className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
-		>
-			<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l9 6 9-6m-18 8h18V8l-9 6-9-6v8z" />
-			</svg>
-			Continue with email code
-		</button>
+		<SubmitFormButton isSubmitting={isSubmitting} title='Continue' />
 	</form>
-
 }
 
-const ConfirmEmailPasswordPage = () => {
+function Slot(props: SlotProps) {
+	return (
+		<div
+			className={`
+				w-10 h-14 text-2xl
+				flex items-center justify-center
+				transition-all duration-300
+				border border-neutral-500 rounded-md
+				bg-transparent text-white
+				focus:outline-none
+				hover:border-neutral-400
+				${props.isActive ? 'border-2 border-white' : 'border border-neutral-500'}
+			`}
+		>
+			<div className="group-has-[input[data-input-otp-placeholder-shown]]:opacity-20">
+				{props.char ?? props.placeholderChar}
+			</div>
+			{/* {props.hasFakeCaret && <FakeCaret />} */}
+		</div>
+	)
+}
+
+const ResetPasswordPage = ({ onSuccess }: OnSuccess) => {
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+		const data = new FormData(e.currentTarget)
+		const email = data.get('email')
+		setIsSubmitting(true)
+		// send reset instructions
+		const req = await new Promise((resolve) => setTimeout(resolve, 1500));
+		onSuccess()
+		setIsSubmitting(false)
+	}
+
+	return (
+		<form className="space-y-4" onSubmit={submitForm}>
+			<div className="grid place-items-center gap-2 w-full">
+				<div className="w-full">
+					{/* Email */}
+					<label htmlFor="email" className='text-sm text-neutral-400'>Email</label>
+					<input
+						type="email"
+						id="email"
+						name="email"
+						required
+						placeholder="Your email address"
+						className="w-full mt-1 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+					/>
+				</div>
+			</div>
+
+			{/* Send reset instructions */}
+			<SubmitFormButton isSubmitting={isSubmitting} title='Continue' />
+
+			{/* <div className="space-y-2">
+					<button
+						type="button"
+						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
+					>
+						Continue with Google
+					</button>
+
+					<button
+						type="button"
+						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
+					>
+						Continue with GitHub
+					</button>
+
+					<button
+						type="button"
+						className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-md flex items-center justify-center gap-2"
+					>
+						Continue with Apple
+					</button>
+				</div> */}
+		</form>
+	)
+}
+
+const OTPPasswordPage = ({ email, onSuccess }: { email?: string } & OnSuccess) => {
+	const [otp, setOtp] = useState('');
+
+	useEffect(() => {
+		if (otp.length === 6) {
+			console.log('confirm otp request')
+			onSuccess && onSuccess()
+		}
+	}, [otp])
+
 	return (
 		<div className="flex flex-col justify-center items-center" >
 			<p className="text-sm text-neutral-300 mb-6">
 				Enter the code sent to <br />
-				<span className="text-white font-medium">••••••••@gmail.com</span>
+				<span className="text-white font-medium">{email}</span>
 			</p>
 
 			{/* Code Inputs (placeholder area) */}
-			<div className="flex justify-center space-x-2 mb-6">
-				{/* Replace this block with 6 inputs later */}
-				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
-				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
-				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
-				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
-				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
-				<div className="w-10 h-12 bg-neutral-800 rounded-md" />
-			</div>
+			<OTPInput
+				value={otp}
+				onChange={setOtp}
+				minLength={6}
+				maxLength={6}
+				required
+				containerClassName="flex justify-center gap-2"
+				render={({ slots }) => (
+					<div style={{
+						width: '100%'
+					}}>
+						<div className="flex gap-2">
+							{slots.map((slot, idx) => (
+								<Slot key={idx} {...slot} />
+							))}
+						</div>
+					</div>
+				)} />
 
 			{/* Resend Link */}
-			<p className="text-xs text-neutral-500">
+			<p className="text-xs text-neutral-500 mt-6">
 				Didn't receive a code?{" "}
 				<button className="text-white hover:underline">
 					Resend (25)
 				</button>
 			</p>
 		</div >
-	)
-}
-
-const ResetPasswordPage = () => {
-	return (
-		<>
-			{/* Email */}
-			<div className="mb-6">
-				<label className="text-sm text-neutral-400 block mb-1">Email</label>
-				<input
-					type="email"
-					placeholder="••••••••@gmail.com"
-					className="w-full rounded-md bg-neutral-950 border border-neutral-700 focus:border-neutral-500 focus:outline-none px-3 py-2 text-sm placeholder-neutral-500 text-neutral-200"
-					defaultValue="••••••••@gmail.com"
-				/>
-			</div>
-
-			{/* Send reset instructions */}
-			<button className="w-full bg-white text-black font-medium py-2 rounded-md hover:bg-neutral-200 transition">
-				Send reset instructions
-			</button>
-		</>
 	)
 }
 
@@ -604,49 +757,8 @@ const AddProvidersPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setP
 		</div>
 	</div>);
 };
-// =============================================
-// 	OnboardingPage
-// 		title:
-// 			div
-// 				"Welcome to Void"
-// 			image
-// 		content:<></>
-// 		title
-// 		content
-// 		prev/next
 
-// 	OnboardingPage
-// 		title:
-// 			div
-// 				"How would you like to use Void?"
-// 		content:
-// 			ModelQuestionContent
-// 				|
-// 					div
-// 						"I want to:"
-// 					div
-// 						"Use the smartest models"
-// 						"Keep my data fully private"
-// 						"Save money"
-// 						"I don't know"
-// 				| div
-// 					| div
-// 						"We recommend using "
-// 						"Set API"
-// 					| div
-// 						""
-// 					| div
-//
-// 		title
-// 		content
-// 		prev/next
-//
-// 	OnboardingPage
-// 		title
-// 		content
-// 		prev/next
-
-const NextButton = ({ onClick, ...props }: { onClick: () => void } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+const NextButton = ({ onClick, ...props }: { onClick: VoidFunction } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
 
 	// Create a new props object without the disabled attribute
 	const { disabled, ...buttonProps } = props;
@@ -672,7 +784,7 @@ const NextButton = ({ onClick, ...props }: { onClick: () => void } & React.Butto
 	)
 }
 
-const PreviousButton = ({ onClick, ...props }: { onClick: () => void } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+const PreviousButton = ({ onClick, ...props }: { onClick: VoidFunction } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
 	return (
 		<button
 			onClick={onClick}
@@ -683,8 +795,6 @@ const PreviousButton = ({ onClick, ...props }: { onClick: () => void } & React.B
 		</button>
 	)
 }
-
-
 
 const OnboardingPageShell = ({ top, bottom, content, hasMaxWidth = true, className = '', }: {
 	top?: React.ReactNode,
@@ -827,7 +937,7 @@ const PrimaryActionButton = ({ children, className, ringSize, ...props }: { chil
 }
 
 
-const PrevButton = ({ onClick }: { onClick: () => void }) => <div className="max-w-[600px] w-full mx-auto flex flex-col items-end">
+const PrevButton = ({ onClick }: { onClick: VoidFunction }) => <div className="max-w-[600px] w-full mx-auto flex flex-col items-end">
 	<div className="flex items-center gap-2">
 		<PreviousButton
 			onClick={onClick}
@@ -840,6 +950,8 @@ const PrevButton = ({ onClick }: { onClick: () => void }) => <div className="max
 
 type WantToUseOption = 'smart' | 'private' | 'cheap' | 'all'
 type StepperFlowType = 'signIn' | 'signUp'
+type StepperPages = { [pageIndex: number]: React.ReactNode }
+type OnSuccess = { onSuccess: VoidFunction }
 
 const VoidOnboardingContent = () => {
 
@@ -855,8 +967,6 @@ const VoidOnboardingContent = () => {
 
 	// page 1 state
 	const [wantToUseOption, setWantToUseOption] = useState<WantToUseOption>('smart')
-
-	const setStep = (idx: number) => setPageIndex(idx)
 
 	// Replace the single selectedProviderName with four separate states
 	// page 2 state - each tab gets its own state
@@ -901,21 +1011,18 @@ const VoidOnboardingContent = () => {
 	const didFillInSelectedProviderSettings = !!(didFillInProviderSettings && isApiKeyLongEnoughIfApiKeyExists && isAtLeastOneModel)
 
 	const prevButton = <PrevButton onClick={() => setPageIndex(idx => idx - 1)} />
-	const returnToSignInButton = <PrevButton onClick={() => setStep(2)} />
+	const returnToSignInButton = <PrevButton onClick={() => setPageIndex(1)} />
 
 
 	const lastPagePrevAndNextButtons = <div className="max-w-[600px] w-full mx-auto flex flex-col items-end">
 		<div className="flex items-center gap-2">
-			<PreviousButton
-				onClick={() => { setPageIndex(pageIndex - 1) }}
-			/>
 			<PrimaryActionButton
 				onClick={() => {
 					voidSettingsService.setGlobalSetting('isOnboardingComplete', true);
 					voidMetricsService.capture('Completed Onboarding', { selectedProviderName, wantToUseOption })
 				}}
 				ringSize={voidSettingsState.globalSettings.isOnboardingComplete ? 'screen' : undefined}
-			>Enter the Void</PrimaryActionButton>
+			>Enter the Evolv</PrimaryActionButton>
 		</div>
 	</div>
 
@@ -964,7 +1071,23 @@ const VoidOnboardingContent = () => {
 		setPageIndex(pageIdx => pageIdx + 1)
 	}
 
-	const stepperFlowStartingPoint: { [pageIndex: number]: React.ReactNode } = {
+	const renderLastStep = <OnboardingPageShell
+		content={
+			<div>
+				<div className="text-5xl font-light text-center">Settings and Themes</div>
+
+				<div className="mt-8 text-center flex flex-col items-center gap-4 w-full max-w-md mx-auto">
+					<h4 className="text-void-fg-3 mb-4">Transfer your settings from an existing editor?</h4>
+					<OneClickSwitchButton className='w-full px-4 py-2' fromEditor="VS Code" />
+					<OneClickSwitchButton className='w-full px-4 py-2' fromEditor="Cursor" />
+					<OneClickSwitchButton className='w-full px-4 py-2' fromEditor="Windsurf" />
+				</div>
+			</div>
+		}
+		bottom={lastPagePrevAndNextButtons}
+	/>
+
+	const stepperFlowStartingPoint: StepperPages = {
 		0: <OnboardingPageShell
 			content={
 				<div className='flex flex-col items-center gap-8'>
@@ -990,72 +1113,55 @@ const VoidOnboardingContent = () => {
 		1: <OnboardingFormPageShell
 			title='Sign in'
 			content={
-				<LoginPage setPageType={setPageType} />
+				<LoginPage setPageType={setPageType} setPageIndex={setPageIndex} />
 			}
 		/>,
 	}
 
-	const signInStepperFlow: { [pageIndex: number]: React.ReactNode } = {
+	console.log(stepperType, pageIndex)
+
+	const signInStepperFlow: StepperPages = {
 		...stepperFlowStartingPoint,
-		2: <OnboardingFormPageShell
-			title='Sign in'
-			content={<SignInPasswordPage setPageIndex={setStep} />}
-			bottom={prevButton}
-		/>,
 		// resetting password (only email input)
-		3: <OnboardingFormPageShell
-			title='Reset your password'
-			content={<ResetPasswordPage />}
+		2: <OnboardingFormPageShell
+			title='Enter your email'
+			content={<ResetPasswordPage onSuccess={() => setPageIndex(3)} />}
 			bottom={prevButton}
 		/>,
-		// currently unused, reserved for reset password page
+		3: <OnboardingFormPageShell
+			title='Check your email'
+			content={<OTPPasswordPage email='test@proton.com' onSuccess={() => setPageIndex(4)} />}
+			bottom={prevButton}
+		/>,
+		// reset password page
 		4: <OnboardingFormPageShell
-			title='Reset your password'
-			content={<CreatePasswordPage pageIndex={pageIndex} setPageIndex={setPageIndex} />}
+			title='Create new password'
+			content={<CreatePasswordPage onSuccess={() => setPageIndex(6)} />}
 			bottom={prevButton}
 		/>,
 		// verifying the code via email
 		5: <OnboardingFormPageShell
 			title='Check your email'
-			content={<ConfirmEmailPasswordPage />}
+			content={<OTPPasswordPage email='test_verify_code@proton.com' onSuccess={() => setPageIndex(6)} />}
 			bottom={returnToSignInButton}
 		/>,
+		6: renderLastStep
 	}
 
-	const signUpStepperFlow: { [pageIndex: number]: React.ReactNode } = {
+	const signUpStepperFlow: StepperPages = {
 		...stepperFlowStartingPoint,
 		2: <OnboardingFormPageShell
 			title='Sign up'
-			content={<SignUpPage pageIndex={pageIndex} setPageIndex={setPageIndex} />}
+			content={<SignUpPage setPageIndex={setPageIndex} onSuccess={() => setPageIndex(3)} />}
 			bottom={prevButton}
 		/>,
 		3: <OnboardingFormPageShell
 			title='Create password'
-			content={<CreatePasswordPage pageIndex={pageIndex} setPageIndex={setPageIndex} />}
+			content={<CreatePasswordPage onSuccess={() => setPageIndex(4)} />}
 			bottom={prevButton}
 		/>,
-		4: <OnboardingFormPageShell
-			title='Check your email'
-			content={<ConfirmEmailPasswordPage />}
-			bottom={prevButton}
-		/>,
-		9: <OnboardingPageShell
-			content={
-				<div>
-					<div className="text-5xl font-light text-center">Settings and Themes</div>
-
-					<div className="mt-8 text-center flex flex-col items-center gap-4 w-full max-w-md mx-auto">
-						<h4 className="text-void-fg-3 mb-4">Transfer your settings from an existing editor?</h4>
-						<OneClickSwitchButton className='w-full px-4 py-2' fromEditor="VS Code" />
-						<OneClickSwitchButton className='w-full px-4 py-2' fromEditor="Cursor" />
-						<OneClickSwitchButton className='w-full px-4 py-2' fromEditor="Windsurf" />
-					</div>
-				</div>
-			}
-			bottom={lastPagePrevAndNextButtons}
-		/>,
+		4: renderLastStep
 	}
-
 
 	return <div key={`${stepperType}-${pageIndex}`} className="w-full h-[80vh] text-left mx-auto flex flex-col items-center justify-center">
 		<ErrorBoundary>
